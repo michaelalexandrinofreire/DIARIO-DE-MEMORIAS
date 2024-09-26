@@ -5,7 +5,7 @@ export default function Button({
   onClick,
   type = "button",
   className = "",
-  color = "bg-blue-500"
+  color = "bg-blue-500",
 }) {
   return (
     <button

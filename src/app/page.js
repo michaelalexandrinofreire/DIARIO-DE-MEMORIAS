@@ -1,7 +1,8 @@
 import Image from "next/image";
 import logo from "./images/logo.svg";
-import Girl from "./images/girl.svg"
+import Girl from "./images/girl.svg";
 import Button from "./components/Button";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -11,8 +12,12 @@ export default function Home() {
           <Image src={logo} priority />
         </a>
         <div className="flex justify-between gap-5">
-          <Button label="Entrar" color="bg-purpleProject" />
-          <Button label="Criar Conta" color="bg-blueProject" />
+          <Link href="/login">
+            <Button label="Entrar" color="bg-purpleProject" />
+          </Link>
+          <Link href="/register">
+            <Button label="Criar Conta" color="bg-blueProject" />
+          </Link>
         </div>
       </header>
       <main className="flex justify-between w-full">
@@ -34,10 +39,13 @@ export default function Home() {
             </p>
             <span className="text-pinkProject"> livre</span> para você.
           </div>
-          <Button label="Começar agora" color="bg-purpleProject" />
+          <a href="/register">
+            {" "}
+            <Button label="Começar agora" color="bg-purpleProject" />{" "}
+          </a>
         </div>
         <div>
-          <Image src={Girl}/>
+          <Image src={Girl} />
         </div>
       </main>
     </div>
