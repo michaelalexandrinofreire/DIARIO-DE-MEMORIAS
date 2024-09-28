@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "../services/firebaseConfig";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // Importa o hook de navegação
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,6 +14,7 @@ export default function Login() {
   const [signInWithEmailAndPassword, user, loading, error] =
     useSignInWithEmailAndPassword(auth);
   const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter(); // Inicializa o roteador
 
   useEffect(() => {
     if (error) {
@@ -27,6 +29,12 @@ export default function Login() {
       setErrorMessage("");
     }
   }, [error]);
+
+  useEffect(() => {
+    if (user) {
+      router.push("/home"); // Redireciona para a página 'home' após login bem-sucedido
+    }
+  }, [user, router]);
 
   function handleSignin(e) {
     e.preventDefault();
