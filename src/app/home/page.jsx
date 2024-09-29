@@ -1,18 +1,23 @@
 "use client";
 import Image from "next/image";
-import logo from ".././images/logo.svg";
-import Button from ".././components/Button";
+import logo from "../images/logo.svg";
+import Button from "../components/Button";
 import { useSignOut } from "react-firebase-hooks/auth";
-import { auth } from "../services/firebaseConfig";
+import { auth, db } from "../services/firebaseConfig";
 import { useRouter } from "next/navigation";
 import Input from "../components/Input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { collection, addDoc, onSnapshot } from "firebase/firestore";
 
 export default function Home() {
   const [signOut] = useSignOut(auth);
   const router = useRouter();
 
   const [showMemoryForm, setShowMemoryForm] = useState(false);
+  const [memories, setMemories] = useState([]);
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState("");
+  const [description, setDescription] = useState("");
 
   const handleSignOut = async () => {
     const success = await signOut();
@@ -20,6 +25,35 @@ export default function Home() {
       router.push("/");
     }
   };
+
+  const handleAddMemory = async () => {
+    if (title && date && description) {
+      try {
+        await addDoc(collection(db, "memories"), {
+          title,
+          date,
+          description,
+        });
+        setTitle("");
+        setDate("");
+        setDescription("");
+        setShowMemoryForm(false);
+      } catch (error) {
+        console.error("Error adding document: ", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "memories"), (snapshot) => {
+      const memoriesList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMemories(memoriesList);
+    });
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div className="relative flex flex-col min-h-screen sm:p-10 font-[family-name:var(--font-geist-sans)]">
@@ -46,10 +80,16 @@ export default function Home() {
           onClick={() => setShowMemoryForm(true)}
         />
         <h1 className="mt-14">MINHAS MEMÓRIAS</h1>
-        <div className="flex justify-between w-full">
-          <div className="">
-            
-          </div>
+        <div className="flex justify-between w-full gap-16 mt-4">
+          {memories.map((memory) => (
+            <div key={memory.id} className="w-1/3 min-h-64 bg-blueProject rounded-[10px] p-3 text-gray-700 font-semibold">
+              <div>
+                <h2>{memory.title}</h2>
+                <p className="text-sm">{memory.date}</p>
+                <p className="overflow-clip text-justify mt-3">{memory.description}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </main>
 
@@ -65,25 +105,31 @@ export default function Home() {
               <Input
                 placeholder="TÍTULO"
                 className="bg-transparent w-1/2 placeholder-gray-950"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
               <Input
                 placeholder="00/00/0000"
                 type="date"
                 className="bg-transparent w-1/2"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
               />
             </div>
             <textarea
-              name=""
-              id=""
               className="bg-transparent border border-[#616161] rounded-[10px] py-1 px-2"
               rows="8"
               cols="40"
+              placeholder="Descrição"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             ></textarea>
             <div className="flex justify-center">
               <Button
                 label="ENVIAR"
                 className="max-w-min items-center justify-center text-sm text-gray-300"
                 color="bg-[#242424]"
+                onClick={handleAddMemory}
               />
             </div>
           </div>
