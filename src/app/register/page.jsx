@@ -99,7 +99,7 @@ export default function Login() {
               type="password"
               required
             />
-            {emailError && (
+            {passwordError && (
               <p className="text-red-500 absolute -bottom-5 text-sm">
                 {passwordError}
               </p>
@@ -124,10 +124,14 @@ export default function Login() {
             onClick={handleSignin}
           />
           {accountCreated && (
-            <p className="text-base text-green-500 mt-4 absolute">Conta criada!</p>
+            <p className="text-base text-green-500 mt-4 absolute">
+              Conta criada!
+            </p>
           )}
           {accountError && (
-            <p className="text-base text-red-500 mt-4 absolute">{accountError}</p>
+            <p className="text-base text-red-500 mt-4 absolute">
+              {accountError}
+            </p>
           )}
         </div>
       </main>
